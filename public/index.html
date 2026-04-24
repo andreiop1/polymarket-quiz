@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Polymarket — Test Your Knowledge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06080f;--surface:#0c1020;--surface2:#111626;--surface3:#17202f;--border:#1c2b42;
+  --blue:#0038FF;--blue-dim:#002ecc;--blue-bright:#1a54ff;--glow:rgba(0,56,255,0.18);--glow2:rgba(0,56,255,0.08);
+  --green:#00e676;--green-glow:rgba(0,230,118,0.13);--red:#ff3d57;--red-glow:rgba(255,61,87,0.13);
+  --gold:#ffc533;--text:#ddeaff;--text-dim:#607899;--text-dimmer:#2e3f58;
+  --fd:'Bricolage Grotesque',sans-serif;--fm:'IBM Plex Mono',monospace;--r:14px;--rl:20px;
+}
+html{font-size:15px}
+body{background:var(--bg);color:var(--text);font-family:var(--fd);min-height:100vh;overflow-x:hidden;position:relative;}
+body::before{content:'';position:fixed;top:-20%;left:-10%;width:65%;height:65%;background:radial-gradient(ellipse,rgba(0,56,255,0.1) 0%,transparent 68%);pointer-events:none;z-index:0;}
+.grid{position:fixed;inset:0;background-image:linear-gradient(rgba(0,56,255,0.055) 1px,transparent 1px),linear-gradient(90deg,rgba(0,56,255,0.055) 1px,transparent 1px);background-size:56px 56px;pointer-events:none;z-index:0;}
+.screen{display:none;position:relative;z-index:1;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:90px 16px 40px;}
+.screen.active{display:flex}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,8,15,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.pm-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.pm-mark{width:36px;height:36px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 18px rgba(0,56,255,0.38);flex-shrink:0;}
+.pm-mark svg{width:18px;height:18px;}
+.pm-wordtext{display:flex;flex-direction:column;}
+.pm-name{font-weight:800;font-size:15px;letter-spacing:-.02em;}
+.pm-tagline{font-family:var(--fm);font-size:9px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
+.nav-right{font-family:var(--fm);font-size:11px;color:var(--text-dim);}
+/* INTRO */
+.intro-wrap{width:100%;max-width:540px;text-align:center;}
+.intro-pill{display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:40px;padding:7px 18px;margin-bottom:28px;font-family:var(--fm);font-size:11px;color:var(--text-dim);letter-spacing:.08em;text-transform:uppercase;}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue);animation:pdot 2s ease-in-out infinite;}
+@keyframes pdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.75)}}
+.intro-title{font-size:clamp(38px,7vw,64px);font-weight:800;line-height:.95;letter-spacing:-.03em;margin-bottom:16px;}
+.intro-title em{font-style:normal;color:var(--blue);}
+.intro-title span{color:var(--text-dim);}
+.intro-sub{font-size:15px;color:var(--text-dim);line-height:1.65;max-width:400px;margin:0 auto 28px;}
+.pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px;}
+.pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:40px;padding:5px 13px;font-size:11px;color:var(--text-dim);font-family:var(--fm);}
+.uform{display:flex;flex-direction:column;gap:10px;width:100%;max-width:380px;margin:0 auto;}
+.flabel{font-size:10px;font-family:var(--fm);color:var(--text-dim);text-align:left;letter-spacing:.08em;text-transform:uppercase;}
+.at-wrap{position:relative;}
+.at-sym{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:var(--fm);font-size:15px;color:var(--blue);font-weight:600;pointer-events:none;}
+#uinput{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:13px 14px 13px 30px;color:var(--text);font-family:var(--fm);font-size:15px;outline:none;transition:border-color .2s,box-shadow .2s;}
+#uinput::placeholder{color:var(--text-dimmer)}
+#uinput:focus{border-color:var(--blue);box-shadow:0 0 0 3px var(--glow);}
+.btn-start{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:var(--fd);font-size:16px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(0,56,255,0.3);}
+.btn-start:hover{background:var(--blue-bright);transform:translateY(-1px);box-shadow:0 8px 28px rgba(0,56,255,.42);}
+.btn-start:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+.intro-note{margin-top:14px;font-size:11px;color:var(--text-dimmer);font-family:var(--fm);}
+/* QUIZ */
+.qwrap{width:100%;max-width:660px;}
+.qheader{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;}
+.qh-l{display:flex;flex-direction:column;gap:3px;}
+.qlbl{font-family:var(--fm);font-size:10px;color:var(--text-dim);letter-spacing:.09em;text-transform:uppercase;}
+.qnum{font-family:var(--fm);font-size:20px;font-weight:600;}
+.qnum span{color:var(--text-dim)}
+.qh-r{display:flex;flex-direction:column;align-items:flex-end;gap:3px;}
+.slbl{font-family:var(--fm);font-size:10px;color:var(--text-dim);letter-spacing:.09em;text-transform:uppercase;}
+.sval{font-family:var(--fm);font-size:20px;font-weight:600;color:var(--blue);}
+.prog{height:3px;background:var(--surface3);border-radius:2px;margin-bottom:14px;overflow:hidden;}
+.prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .4s ease;box-shadow:0 0 8px rgba(0,56,255,.5);}
+.dbadge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:3px 11px;font-family:var(--fm);font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px;}
+.dbadge.easy{background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.2)}
+.dbadge.medium{background:rgba(255,197,51,.1);color:var(--gold);border:1px solid rgba(255,197,51,.2)}
+.dbadge.advanced{background:rgba(255,61,87,.1);color:var(--red);border:1px solid rgba(255,61,87,.2)}
+/* Card — timer never overlaps text */
+.qcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:24px;margin-bottom:12px;transition:box-shadow .3s;}
+.qcard-top{display:flex;align-items:flex-start;gap:16px;}
+.qtxt{font-size:clamp(15px,2.3vw,18px);font-weight:700;line-height:1.5;letter-spacing:-.01em;flex:1;padding-top:3px;}
+.timer-col{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.timer-ring-wrap{position:relative;width:52px;height:52px;}
+.tsvg{transform:rotate(-90deg);}
+.t-track{fill:none;stroke:var(--surface3);stroke-width:4;}
+.t-arc{fill:none;stroke:var(--blue);stroke-width:4;stroke-linecap:round;stroke-dasharray:138.2;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .3s;}
+.t-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:14px;font-weight:600;color:var(--text);}
+.ogrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:500px){.ogrid{grid-template-columns:1fr}}
+.opt{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:13px 15px;color:var(--text);font-family:var(--fd);font-size:13px;font-weight:600;text-align:left;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:10px;line-height:1.45;}
+.opt:not(.disabled):hover{border-color:var(--blue);background:var(--surface3);box-shadow:0 0 0 1px var(--blue),0 4px 14px var(--glow);}
+.opt.disabled{cursor:default}
+.opt.correct{border-color:var(--green);background:var(--green-glow);color:var(--green);}
+.opt.wrong{border-color:var(--red);background:var(--red-glow);color:var(--red);}
+.oltr{width:20px;height:20px;border-radius:5px;background:var(--surface3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:10px;font-weight:600;flex-shrink:0;margin-top:1px;transition:all .15s;color:var(--text-dim);}
+.opt.correct .oltr{background:var(--green);border-color:var(--green);color:#000}
+.opt.wrong .oltr{background:var(--red);border-color:var(--red);color:#fff}
+.opt:not(.disabled):hover .oltr{background:var(--blue);border-color:var(--blue);color:#fff}
+.expbox{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-top:10px;display:none;gap:9px;align-items:flex-start;animation:sup .3s ease;}
+.expbox.show{display:flex}
+@keyframes sup{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.expicon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.exptxt{font-size:13px;color:var(--text-dim);line-height:1.6;}
+.exptxt strong{color:var(--text);font-weight:600;}
+.btn-next{width:100%;padding:13px;margin-top:10px;background:transparent;border:1px solid var(--border);border-radius:var(--r);color:var(--text-dim);font-family:var(--fd);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:none;align-items:center;justify-content:center;gap:8px;}
+.btn-next.show{display:flex}
+.btn-next:hover{border-color:var(--blue);color:var(--text);background:var(--glow2);}
+/* SCAM */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);z-index:500;align-items:center;justify-content:center;padding:20px;animation:fi .3s ease;}
+.overlay.show{display:flex}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.sbox{background:linear-gradient(145deg,#090f20,#0c163a);border:1px solid rgba(255,197,51,.28);border-radius:var(--rl);max-width:420px;width:100%;padding:28px;position:relative;box-shadow:0 0 60px rgba(255,197,51,.07),0 24px 64px rgba(0,0,0,.6);animation:pi .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pi{from{opacity:0;transform:scale(.84) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.sx{position:absolute;top:12px;right:12px;width:28px;height:28px;background:rgba(255,255,255,.07);border:none;border-radius:50%;color:var(--text-dim);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.sx:hover{background:rgba(255,255,255,.14);color:var(--text)}
+.sbrand{display:flex;align-items:center;gap:9px;margin-bottom:16px;}
+.sbrand-icon{width:36px;height:36px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.sbrand-name{font-weight:800;font-size:15px;}
+.sbrand-tag{background:rgba(255,197,51,.13);border:1px solid rgba(255,197,51,.27);border-radius:5px;padding:2px 8px;font-family:var(--fm);font-size:9px;color:var(--gold);font-weight:600;letter-spacing:.09em;text-transform:uppercase;margin-top:2px;}
+.sh{font-size:21px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px;line-height:1.2;}
+.sh .g{color:var(--gold)}
+.sp{font-size:13px;color:#96accc;line-height:1.65;margin-bottom:16px;}
+.samt{background:rgba(255,197,51,.07);border:1px solid rgba(255,197,51,.17);border-radius:10px;padding:14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.samt-lbl{font-size:10px;color:#6a7d99;font-family:var(--fm);}
+.samt-val{font-family:var(--fm);font-size:20px;font-weight:600;color:var(--gold);}
+.sclock{font-size:11px;color:var(--red);font-family:var(--fm);text-align:center;margin-bottom:14px;}
+.btn-wallet{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue-dim),var(--blue-bright));border:none;border-radius:var(--r);color:#fff;font-family:var(--fd);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 4px 18px rgba(0,56,255,.3);margin-bottom:8px;}
+.btn-wallet:hover{transform:translateY(-1px);box-shadow:0 8px 26px rgba(0,56,255,.42);}
+.sfine{font-size:10px;color:#243244;text-align:center;font-family:var(--fm);}
+/* EDU */
+.edu-wrap{width:100%;max-width:600px;}
+.edu-icon{width:72px;height:72px;background:rgba(255,61,87,.1);border:2px solid rgba(255,61,87,.27);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 20px;animation:ap 1.5s ease-in-out 3;}
+@keyframes ap{0%,100%{box-shadow:0 0 0 0 rgba(255,61,87,.3)}50%{box-shadow:0 0 0 14px rgba(255,61,87,0)}}
+.edu-title{font-size:clamp(24px,4vw,36px);font-weight:800;letter-spacing:-.02em;text-align:center;margin-bottom:10px;line-height:1.1;}
+.edu-title .r{color:var(--red)}
+.edu-sub{font-size:14px;color:var(--text-dim);text-align:center;line-height:1.65;margin-bottom:22px;}
+.edu-alert{background:rgba(255,61,87,.08);border:1px solid rgba(255,61,87,.2);border-radius:var(--r);padding:13px 16px;margin-bottom:18px;display:flex;gap:10px;}
+.ea-icon{font-size:17px;flex-shrink:0;}
+.ea-txt{font-size:13px;color:#d97087;line-height:1.6;}
+.ea-txt strong{color:var(--red);display:block;margin-bottom:3px;}
+.edu-rules{display:flex;flex-direction:column;gap:9px;margin-bottom:22px;}
+.erule{display:flex;align-items:flex-start;gap:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:12px 15px;}
+.ern{width:24px;height:24px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:11px;font-weight:600;color:#fff;flex-shrink:0;}
+.ert{font-size:13px;color:var(--text-dim);line-height:1.55;}
+.ert strong{color:var(--text);display:block;margin-bottom:2px;}
+.btn-restart{width:100%;padding:14px;background:var(--blue);border:none;border-radius:var(--r);color:#fff;font-family:var(--fd);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(0,56,255,.28);}
+.btn-restart:hover{background:var(--blue-bright);transform:translateY(-1px);}
+/* RESULTS */
+.rwrap{width:100%;max-width:660px;}
+.rheader{text-align:center;margin-bottom:22px;}
+.remoji{font-size:52px;display:block;margin-bottom:12px;animation:pe .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pe{from{transform:scale(0)}to{transform:scale(1)}}
+.rtitle{font-size:clamp(26px,5vw,42px);font-weight:800;letter-spacing:-.03em;line-height:1;margin-bottom:7px;}
+.rhandle{color:var(--blue);}
+.rsub{font-size:14px;color:var(--text-dim);line-height:1.5;}
+.scards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+@media(max-width:420px){.scards{grid-template-columns:1fr 1fr}.scard:first-child{grid-column:1/-1}}
+.scard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center;}
+.scard.hi{border-color:var(--blue);background:var(--glow2);}
+.sclbl{font-family:var(--fm);font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.09em;margin-bottom:6px;}
+.scval{font-family:var(--fm);font-size:24px;font-weight:600;}
+.scard.hi .scval{color:var(--blue)}
+.scsub{font-size:11px;color:var(--text-dimmer);margin-top:3px;font-family:var(--fm);}
+.lbcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:22px;margin-bottom:16px;}
+.lbtabs{display:flex;gap:4px;margin-bottom:16px;background:var(--surface2);border:1px solid var(--border);border-radius:40px;padding:4px;}
+.lbtab{flex:1;padding:7px;border:none;background:transparent;color:var(--text-dim);font-family:var(--fm);font-size:11px;font-weight:600;cursor:pointer;border-radius:30px;transition:all .2s;letter-spacing:.04em;text-transform:uppercase;}
+.lbtab.active{background:var(--blue);color:#fff;box-shadow:0 2px 10px rgba(0,56,255,.3);}
+.lbtab:not(.active):hover{color:var(--text);}
+.lblist{display:flex;flex-direction:column;gap:7px;}
+.lbrow{display:grid;grid-template-columns:34px 1fr auto auto;align-items:center;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.lbrow.you{border-color:var(--blue);background:var(--glow2);}
+.lbrank{font-family:var(--fm);font-size:12px;font-weight:600;color:var(--text-dim);text-align:center;}
+.lbrank.g{color:var(--gold)}.lbrank.s{color:#90a8c4}.lbrank.b{color:#b07850}.lbrank.med{font-size:15px;}
+.lbname{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px;min-width:0;}
+.lbntext{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lbyou{font-family:var(--fm);font-size:9px;background:var(--blue);color:#fff;border-radius:4px;padding:1px 5px;flex-shrink:0;}
+.lbcorr{font-family:var(--fm);font-size:11px;color:var(--text-dim);white-space:nowrap;}
+.lbpts{font-family:var(--fm);font-size:13px;font-weight:600;color:var(--blue);white-space:nowrap;}
+.lbempty{text-align:center;padding:26px;color:var(--text-dimmer);font-family:var(--fm);font-size:12px;}
+.lbload{text-align:center;padding:16px;color:var(--text-dimmer);font-family:var(--fm);font-size:12px;animation:blink 1.2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.ract{display:flex;gap:10px;}
+.btn-again{flex:1;padding:13px;background:var(--blue);border:none;border-radius:var(--r);color:#fff;font-family:var(--fd);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 18px rgba(0,56,255,.28);}
+.btn-again:hover{background:var(--blue-bright);transform:translateY(-1px);}
+.btn-share{padding:13px 18px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text-dim);font-family:var(--fd);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn-share:hover{border-color:var(--blue);color:var(--text);background:var(--glow2);}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface3);border:1px solid var(--border);border-radius:40px;padding:8px 20px;font-family:var(--fm);font-size:12px;color:var(--text);transition:transform .3s cubic-bezier(.34,1.56,.64,1);z-index:9999;pointer-events:none;}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.fade-in{animation:fiu .4s ease both}
+@keyframes fiu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.shake{animation:shk .4s ease}
+@keyframes shk{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+/* ── DISCORD NOTIFICATION BADGE ── */
+#dc-badge{position:fixed;bottom:24px;right:24px;width:46px;height:46px;background:#5865F2;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transform:scale(.5);transition:all .4s cubic-bezier(.34,1.56,.64,1);z-index:200;box-shadow:0 4px 16px rgba(88,101,242,.5)}
+#dc-badge.show{opacity:1;transform:scale(1)}
+#dc-badge svg{width:22px;height:22px}
+.dc-notif-dot{position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:#ed4245;border-radius:50%;border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;font-family:var(--fm);animation:bpulse 2s ease-in-out infinite}
+@keyframes bpulse{0%,100%{box-shadow:0 0 0 0 rgba(237,66,69,.5)}50%{box-shadow:0 0 0 5px rgba(237,66,69,0)}}
+/* ── DISCORD TOAST ── */
+#dc-toast{position:fixed;bottom:24px;right:24px;width:300px;background:#18191c;border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:10px;display:flex;align-items:flex-start;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.7);cursor:pointer;opacity:0;transform:translateY(16px);transition:all .35s cubic-bezier(.34,1.2,.64,1);z-index:200}
+#dc-toast.show{opacity:1;transform:translateY(0)}
+#dc-toast:hover{background:#1e1f24}
+.dct-logo{width:36px;height:36px;background:#5865F2;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.dct-logo svg{width:20px;height:20px}
+.dct-body{flex:1;min-width:0}
+.dct-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.dct-app{font-size:10px;font-weight:700;color:#b9bbbe;text-transform:uppercase;letter-spacing:.02em;font-family:var(--fm)}
+.dct-time{font-size:10px;color:#72767d;font-family:var(--fm)}
+.dct-sender{font-size:13px;font-weight:600;color:#fff;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--fm)}
+.dct-prev{font-size:12px;color:#b9bbbe;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--fm)}
+/* ── DISCORD MODAL ── */
+#dc-modal{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(6px);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .3s}
+#dc-modal.show{opacity:1;pointer-events:all}
+.dc-app{width:100%;max-width:860px;height:540px;background:#36393f;border-radius:8px;overflow:hidden;display:flex;box-shadow:0 20px 60px rgba(0,0,0,.9);animation:dcIn .4s cubic-bezier(.34,1.1,.64,1)}
+@keyframes dcIn{from{transform:scale(.9) translateY(16px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.dc-servers{width:68px;background:#202225;padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0}
+.dc-home-btn{width:48px;height:48px;border-radius:50%;background:#5865F2;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-radius .15s;flex-shrink:0}
+.dc-home-btn:hover{border-radius:16px}
+.dc-home-btn svg{width:22px;height:18px}
+.dc-srv-sep{width:28px;height:2px;background:#36393f;border-radius:1px}
+.dc-pm-srv{width:48px;height:48px;border-radius:16px;background:var(--blue);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,.15)}
+.dc-pm-srv::before{content:'';position:absolute;left:-10px;width:4px;height:75%;background:#fff;border-radius:0 4px 4px 0;top:50%;transform:translateY(-50%)}
+.dc-pm-srv svg{width:24px;height:20px}
+.dc-sidebar{width:220px;background:#2f3136;display:flex;flex-direction:column;flex-shrink:0}
+.dc-sidebar-hdr{padding:10px 14px;border-bottom:1px solid rgba(0,0,0,.2);font-size:13px;font-weight:600;color:#fff;font-family:var(--fm)}
+.dc-dm-list{flex:1;padding:6px}
+.dc-dm-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:4px;background:rgba(255,255,255,.1);color:#fff}
+.dc-dm-av{width:32px;height:32px;border-radius:50%;background:var(--blue);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;position:relative}
+.dc-online{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;background:#3ba55c;border-radius:50%;border:2px solid #2f3136}
+.dc-dm-name{font-size:13px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--fm)}
+.dc-staff-tag{background:#5865F2;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;font-family:var(--fm);flex-shrink:0}
+.dc-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.dc-header{height:46px;background:#36393f;border-bottom:1px solid #202225;display:flex;align-items:center;padding:0 14px;gap:9px;flex-shrink:0}
+.dc-header-av{width:26px;height:26px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;position:relative}
+.dc-header-online{position:absolute;bottom:-1px;right:-1px;width:8px;height:8px;background:#3ba55c;border-radius:50%;border:1px solid #36393f}
+.dc-header-name{font-size:14px;font-weight:600;color:#fff;font-family:var(--fm)}
+.dc-header-badge{background:#5865F2;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;font-family:var(--fm)}
+#dc-messages{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+#dc-messages::-webkit-scrollbar{width:6px}
+#dc-messages::-webkit-scrollbar-thumb{background:#202225;border-radius:3px}
+.dc-sys-msg{text-align:center;font-size:11px;color:#72767d;padding:5px 0 14px;font-family:var(--fm)}
+.dc-msg-group{display:flex;gap:14px;padding:3px 0;align-items:flex-start}
+.dc-msg-group:hover{background:rgba(4,4,5,.07);margin:0 -14px;padding:3px 14px}
+.dc-msg-av{width:36px;height:36px;border-radius:50%;background:var(--blue);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
+.dc-msg-body{flex:1}
+.dc-msg-hdr{display:flex;align-items:baseline;gap:7px;margin-bottom:3px}
+.dc-msg-author{font-size:14px;font-weight:500;color:#fff;font-family:var(--fm)}
+.dc-msg-badge{background:#5865F2;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px;text-transform:uppercase;letter-spacing:.04em;font-family:var(--fm)}
+.dc-msg-ts{font-size:10px;color:#72767d;font-family:var(--fm)}
+.dc-msg-text{font-size:14px;color:#dcddde;line-height:1.5;animation:msgIn .2s ease;font-family:var(--fm)}
+@keyframes msgIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.dc-followup{padding:2px 0 2px 50px}
+.dc-followup-text{font-size:14px;color:#dcddde;line-height:1.5;animation:msgIn .2s ease;font-family:var(--fm)}
+.dc-typing{display:flex;gap:14px;padding:6px 0;opacity:0;transition:opacity .2s;align-items:center}
+.dc-typing.show{opacity:1}
+.dc-typing-av{width:36px;height:36px;border-radius:50%;background:var(--blue);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff}
+.dc-typing-bub{background:#2e3035;border-radius:10px 10px 10px 3px;padding:8px 10px;display:flex;align-items:center;gap:3px}
+.dc-dot{width:7px;height:7px;background:#72767d;border-radius:50%;animation:dcDot 1.2s ease-in-out infinite}
+.dc-dot:nth-child(2){animation-delay:.15s}
+.dc-dot:nth-child(3){animation-delay:.3s}
+@keyframes dcDot{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+.dc-cta-wrap{margin-top:10px}
+.dc-cta-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:none;border-radius:3px;font-size:13px;font-weight:600;cursor:pointer;transition:filter .15s;font-family:var(--fm)}
+.dc-cta-btn:hover{filter:brightness(.9)}
+.dc-input-bar{padding:14px;background:#36393f;flex-shrink:0}
+.dc-input-inner{background:#40444b;border-radius:7px;padding:9px 14px;display:flex;align-items:center}
+.dc-input-ph{font-size:14px;color:#72767d;font-family:var(--fm)}
+#dc-safe-btn{display:block;margin:14px auto 0;background:rgba(0,0,0,.75);border:1px solid rgba(88,101,242,.35);color:#b9bbbe;font-family:var(--fm);font-size:11px;padding:7px 20px;border-radius:40px;cursor:pointer;opacity:0;transition:all .5s;white-space:nowrap;pointer-events:none}
+#dc-safe-btn.show{opacity:1;pointer-events:all}
+#dc-safe-btn:hover{background:rgba(88,101,242,.15);border-color:#5865F2;color:#fff}
+/* ── DISCORD EDUCATION ── */
+#s-edu-dc{display:none;position:fixed;inset:0;background:var(--bg);overflow-y:auto;z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:80px 16px 40px}
+#s-edu-dc.active{display:flex}
+.edu-dc-wrap{width:100%;max-width:600px}
+.edu-dc-icon{width:72px;height:72px;background:#5865F2;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:epop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes epop{from{transform:scale(0)}to{transform:scale(1)}}
+</style>
+</head>
+<body>
+<div class="grid"></div>
+<nav class="nav">
+  <a href="#" class="pm-logo" onclick="return false">
+    <div class="pm-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2.5L21 7.25V16.75L12 21.5L3 16.75V7.25L12 2.5Z" fill="white"/></svg></div>
+    <div class="pm-wordtext"><div class="pm-name">Polymarket</div><div class="pm-tagline">Knowledge Quiz</div></div>
+  </a>
+  <div class="nav-right" id="nav-pts"></div>
+</nav>
+
+<!-- INTRO -->
+<div class="screen active" id="s-intro">
+  <div class="intro-wrap fade-in">
+    <div class="intro-pill"><div class="pdot"></div>150-Question Knowledge Bank</div>
+    <h1 class="intro-title">Test Your<br><em>Polymarket</em><br><span>Knowledge</span></h1>
+    <p class="intro-sub">10 randomized questions per quiz. Beat the clock, learn the platform, and compete on the global leaderboard.</p>
+    <div class="pills">
+      <div class="pill">⏱ 15 sec per question</div>
+      <div class="pill">🎲 Unique every run</div>
+      <div class="pill">🏆 Global leaderboard</div>
+      <div class="pill">🛡 Trust &amp; Safety trap</div>
+    </div>
+    <div class="uform">
+      <div class="flabel">Your Polymarket Username</div>
+      <div class="at-wrap"><span class="at-sym">@</span><input type="text" id="uinput" placeholder="yourhandle" maxlength="30" autocomplete="off" spellcheck="false"></div>
+      <button class="btn-start" id="btn-start" disabled onclick="startQuiz()">Start Quiz →</button>
+    </div>
+    <p class="intro-note">No wallet required · Username used for leaderboard display only</p>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="s-quiz">
+  <div class="qwrap">
+    <div class="qheader">
+      <div class="qh-l"><div class="qlbl">Question</div><div class="qnum" id="qnum">1 <span>/ 10</span></div></div>
+      <div class="qh-r"><div class="slbl">Score</div><div class="sval" id="lscore">0</div></div>
+    </div>
+    <div class="prog"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+    <div class="dbadge easy" id="dbadge">● Easy</div>
+    <div class="qcard" id="qcard">
+      <div class="qcard-top">
+        <div class="qtxt" id="qtxt">Loading…</div>
+        <div class="timer-col">
+          <div class="timer-ring-wrap">
+            <svg class="tsvg" width="52" height="52" viewBox="0 0 52 52">
+              <circle class="t-track" cx="26" cy="26" r="22"/>
+              <circle class="t-arc" id="tarc" cx="26" cy="26" r="22"/>
+            </svg>
+            <div class="t-num" id="tnum">15</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ogrid" id="ogrid"></div>
+    <div class="expbox" id="expbox"><div class="expicon" id="expicon">💡</div><div class="exptxt" id="exptxt"></div></div>
+    <button class="btn-next" id="btn-next" onclick="nextQ()">Next Question →</button>
+  </div>
+</div>
+
+<!-- AIRDROP SCAM -->
+<div class="overlay" id="ao">
+  <div class="sbox">
+    <button class="sx" onclick="closeAirdrop()">✕</button>
+    <div class="sbrand"><div class="sbrand-icon">💎</div><div><div class="sbrand-name">Polymarket</div><div class="sbrand-tag">🎉 Official Airdrop</div></div></div>
+    <h2 class="sh">Claim Your <span class="g">$POLY Airdrop</span> Now!</h2>
+    <p class="sp">You've been selected as an eligible user for the official Polymarket token airdrop. Connect your Web3 wallet immediately to claim your allocation before it expires.</p>
+    <div class="samt"><div><div class="samt-lbl">Your allocation</div><div class="samt-val">500 $POLY</div></div><div style="text-align:right"><div class="samt-lbl">Est. value</div><div class="samt-val">~$1,200</div></div></div>
+    <div class="sclock" id="sclock">⏰ Offer expires in: 09:47 — Act now!</div>
+    <button class="btn-wallet" onclick="fellForAirdrop()">🔗 Connect Wallet &amp; Claim $POLY</button>
+    <div class="sfine">By connecting, you agree to grant access to your wallet. Powered by Polymarket Official.</div>
+  </div>
+</div>
+
+<!-- DISCORD BADGE -->
+<div id="dc-badge" onclick="toastClick()">
+  <svg viewBox="0 0 71 55" fill="none"><path d="M60.105 4.898A58.55 58.55 0 0 0 45.803.465a.389.389 0 0 0-.423.199 40.784 40.784 0 0 0-1.8 3.7c-5.418-.812-10.805-.812-16.11 0-.485-1.164-1.201-2.587-1.83-3.7a.4.4 0 0 0-.423-.199 58.348 58.348 0 0 0-14.302 4.433.368.368 0 0 0-.168.144C1.534 18.773-.922 32.214.29 45.482a.44.44 0 0 0 .163.296c6.011 4.41 11.831 7.091 17.547 8.858a.416.416 0 0 0 .45-.149 42.08 42.08 0 0 0 3.616-5.884.41.41 0 0 0-.22-.567 38.818 38.818 0 0 1-5.55-2.645.417.417 0 0 1-.04-.692c.373-.28.746-.57 1.1-.862a.4.4 0 0 1 .419-.056c11.646 5.315 24.256 5.315 35.752 0a.399.399 0 0 1 .422.05c.353.293.726.588 1.101.868a.417.417 0 0 1-.037.692 36.498 36.498 0 0 1-5.553 2.64.413.413 0 0 0-.218.571 47.267 47.267 0 0 0 3.61 5.88.41.41 0 0 0 .45.152c5.742-1.767 11.562-4.448 17.573-8.858a.42.42 0 0 0 .162-.292c1.466-15.173-2.455-28.504-10.39-40.28a.33.33 0 0 0-.165-.147zm-35.942 32.3c-3.475 0-6.34-3.19-6.34-7.114 0-3.923 2.81-7.113 6.34-7.113 3.56 0 6.396 3.22 6.34 7.113.001 3.923-2.81 7.113-6.34 7.113zm23.44 0c-3.475 0-6.34-3.19-6.34-7.114 0-3.923 2.81-7.113 6.34-7.113 3.56 0 6.396 3.22 6.34 7.113 0 3.923-2.81 7.113-6.34 7.113z" fill="white"/></svg>
+  <div class="dc-notif-dot">1</div>
+</div>
+
+<!-- DISCORD TOAST -->
+<div id="dc-toast" onclick="openDiscordDM()">
+  <div class="dct-logo"><svg width="20" height="20" viewBox="0 0 71 55" fill="none"><path d="M60.105 4.898A58.55 58.55 0 0 0 45.803.465a.389.389 0 0 0-.423.199 40.784 40.784 0 0 0-1.8 3.7c-5.418-.812-10.805-.812-16.11 0-.485-1.164-1.201-2.587-1.83-3.7a.4.4 0 0 0-.423-.199 58.348 58.348 0 0 0-14.302 4.433.368.368 0 0 0-.168.144C1.534 18.773-.922 32.214.29 45.482a.44.44 0 0 0 .163.296c6.011 4.41 11.831 7.091 17.547 8.858a.416.416 0 0 0 .45-.149 42.08 42.08 0 0 0 3.616-5.884.41.41 0 0 0-.22-.567 38.818 38.818 0 0 1-5.55-2.645.417.417 0 0 1-.04-.692c.373-.28.746-.57 1.1-.862a.4.4 0 0 1 .419-.056c11.646 5.315 24.256 5.315 35.752 0a.399.399 0 0 1 .422.05c.353.293.726.588 1.101.868a.417.417 0 0 1-.037.692 36.498 36.498 0 0 1-5.553 2.64.413.413 0 0 0-.218.571 47.267 47.267 0 0 0 3.61 5.88.41.41 0 0 0 .45.152c5.742-1.767 11.562-4.448 17.573-8.858a.42.42 0 0 0 .162-.292c1.466-15.173-2.455-28.504-10.39-40.28a.33.33 0 0 0-.165-.147zm-35.942 32.3c-3.475 0-6.34-3.19-6.34-7.114 0-3.923 2.81-7.113 6.34-7.113 3.56 0 6.396 3.22 6.34 7.113.001 3.923-2.81 7.113-6.34 7.113zm23.44 0c-3.475 0-6.34-3.19-6.34-7.114 0-3.923 2.81-7.113 6.34-7.113 3.56 0 6.396 3.22 6.34 7.113 0 3.923-2.81 7.113-6.34 7.113z" fill="white"/></svg></div>
+  <div class="dct-body">
+    <div class="dct-row"><span class="dct-app">Discord</span><span class="dct-time">now</span></div>
+    <div class="dct-sender" id="dc-toast-sender">Polymarket Support</div>
+    <div class="dct-prev" id="dc-toast-prev">Hey, I'm reaching out from the Trust &amp; Safety...</div>
+  </div>
+</div>
+
+<!-- DISCORD DM MODAL -->
+<div id="dc-modal">
+  <div class="dc-app">
+    <div class="dc-servers">
+      <div class="dc-home-btn"><svg viewBox="0 0 71 55" fill="none"><path d="M60.105 4.898A58.55 58.55 0 0 0 45.803.465a.389.389 0 0 0-.423.199 40.784 40.784 0 0 0-1.8 3.7c-5.418-.812-10.805-.812-16.11 0-.485-1.164-1.201-2.587-1.83-3.7a.4.4 0 0 0-.423-.199 58.348 58.348 0 0 0-14.302 4.433.368.368 0 0 0-.168.144C1.534 18.773-.922 32.214.29 45.482a.44.44 0 0 0 .163.296c6.011 4.41 11.831 7.091 17.547 8.858a.416.416 0 0 0 .45-.149 42.08 42.08 0 0 0 3.616-5.884.41.41 0 0 0-.22-.567 38.818 38.818 0 0 1-5.55-2.645.417.417 0 0 1-.04-.692c.373-.28.746-.57 1.1-.862a.4.4 0 0 1 .419-.056c11.646 5.315 24.256 5.315 35.752 0a.399.399 0 0 1 .422.05c.353.293.726.588 1.101.868a.417.417 0 0 1-.037.692 36.498 36.498 0 0 1-5.553 2.64.413.413 0 0 0-.218.571 47.267 47.267 0 0 0 3.61 5.88.41.41 0 0 0 .45.152c5.742-1.767 11.562-4.448 17.573-8.858a.42.42 0 0 0 .162-.292c1.466-15.173-2.455-28.504-10.39-40.28a.33.33 0 0 0-.165-.147zm-35.942 32.3c-3.475 0-6.34-3.19-6.34-7.114 0-3.923 2.81-7.113 6.34-7.113 3.56 0 6.396 3.22 6.34 7.113.001 3.923-2.81 7.113-6.34 7.113zm23.44 0c-3.475 0-6.34-3.19-6.34-7.114 0-3.923 2.81-7.113 6.34-7.113 3.56 0 6.396 3.22 6.34 7.113 0 3.923-2.81 7.113-6.34 7.113z" fill="white"/></svg></div>
+      <div class="dc-srv-sep"></div>
+      <div class="dc-pm-srv"><svg viewBox="0 0 24 24" fill="none" width="26" height="22"><path d="M12 2.5L21 7.25V16.75L12 21.5L3 16.75V7.25L12 2.5Z" fill="white"/></svg></div>
+    </div>
+    <div class="dc-sidebar">
+      <div class="dc-sidebar-hdr">Direct Messages</div>
+      <div class="dc-dm-list">
+        <div class="dc-dm-item">
+          <div class="dc-dm-av"><span id="dc-av-init">PS</span><div class="dc-online"></div></div>
+          <div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><div class="dc-dm-name" id="dc-sidebar-name">Polymarket Support</div><div class="dc-staff-tag">STAFF</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="dc-main">
+      <div class="dc-header">
+        <div class="dc-header-av"><span id="dc-hdr-init">PS</span><div class="dc-header-online"></div></div>
+        <div class="dc-header-name" id="dc-hdr-name">Polymarket Support</div>
+        <div class="dc-header-badge">STAFF</div>
+      </div>
+      <div id="dc-messages"></div>
+      <div class="dc-input-bar"><div class="dc-input-inner"><div class="dc-input-ph" id="dc-input-ph">Message @Polymarket Support</div></div></div>
+    </div>
+  </div>
+  <button id="dc-safe-btn" onclick="knownScam()">I know this is a scam</button>
+</div>
+
+<!-- EDU -->
+<div class="screen" id="s-edu">
+  <div class="edu-wrap fade-in">
+    <div class="edu-icon">🚨</div>
+    <h1 class="edu-title">You Just Clicked a<br><span class="r">Crypto Scam</span></h1>
+    <p class="edu-sub">That "airdrop" popup was a simulated phishing trap — a Trust &amp; Safety lesson built into this quiz. You're safe here, but in the real world that click could have drained your wallet instantly.</p>
+    <div class="edu-alert"><div class="ea-icon">⚠️</div><div class="ea-txt"><strong>What just happened</strong>Scammers impersonate real brands using official logos and language. They create urgency with fake countdowns and large dollar amounts. A real "Connect Wallet" button grants unlimited token approval to an attacker's contract.</div></div>
+    <div class="edu-rules">
+      <div class="erule"><div class="ern">1</div><div class="ert"><strong>Polymarket has NOT released a $POLY token</strong>Any airdrop involving $POLY, $PM, or any Polymarket token is 100% a scam.</div></div>
+      <div class="erule"><div class="ern">2</div><div class="ert"><strong>Legitimate projects never use surprise pop-ups</strong>Real announcements come from @Polymarket on X, Discord, or polymarket.com.</div></div>
+      <div class="erule"><div class="ern">3</div><div class="ert"><strong>Urgency is always a red flag</strong>"Act now! 09:47 remaining!" is a manipulation tactic. Legitimate airdrops have public timelines.</div></div>
+      <div class="erule"><div class="ern">4</div><div class="ert"><strong>Never approve unknown wallet connection requests</strong>Connecting a wallet can grant unlimited permission to move your funds.</div></div>
+      <div class="erule"><div class="ern">5</div><div class="ert"><strong>When in doubt, go directly to the source</strong>Bookmark polymarket.com and report anything suspicious in the official Discord.</div></div>
+    </div>
+    <button class="btn-restart" onclick="goIntro()">🔄 Restart Quiz</button>
+  </div>
+</div>
+
+<!-- DISCORD EDU SCREEN -->
+<div id="s-edu-dc">
+  <div class="edu-dc-wrap fade-in">
+    <div class="edu-dc-icon">
+      <svg width="34" height="26" viewBox="0 0 71 55" fill="none"><path d="M60.105 4.898A58.55 58.55 0 0 0 45.803.465a.389.389 0 0 0-.423.199 40.784 40.784 0 0 0-1.8 3.7c-5.418-.812-10.805-.812-16.11 0-.485-1.164-1.201-2.587-1.83-3.7a.4.4 0 0 0-.423-.199 58.348 58.348 0 0 0-14.302 4.433.368.368 0 0 0-.168.144C1.534 18.773-.922 32.214.29 45.482a.44.44 0 0 0 .163.296c6.011 4.41 11.831 7.091 17.547 8.858a.416.416 0 0 0 .45-.149 42.08 42.08 0 0 0 3.616-5.884.41.41 0 0 0-.22-.567 38.818 38.818 0 0 1-5.55-2.645.417.417 0 0 1-.04-.692c.373-.28.746-.57 1.1-.862a.4.4 0 0 1 .419-.056c11.646 5.315 24.256 5.315 35.752 0a.399.399 0 0 1 .422.05c.353.293.726.588 1.101.868a.417.417 0 0 1-.037.692 36.498 36.498 0 0 1-5.553 2.64.413.413 0 0 0-.218.571 47.267 47.267 0 0 0 3.61 5.88.41.41 0 0 0 .45.152c5.742-1.767 11.562-4.448 17.573-8.858a.42.42 0 0 0 .162-.292c1.466-15.173-2.455-28.504-10.39-40.28a.33.33 0 0 0-.165-.147zm-35.942 32.3c-3.475 0-6.34-3.19-6.34-7.114 0-3.923 2.81-7.113 6.34-7.113 3.56 0 6.396 3.22 6.34 7.113.001 3.923-2.81 7.113-6.34 7.113zm23.44 0c-3.475 0-6.34-3.19-6.34-7.114 0-3.923 2.81-7.113 6.34-7.113 3.56 0 6.396 3.22 6.34 7.113 0 3.923-2.81 7.113-6.34 7.113z" fill="white"/></svg>
+    </div>
+    <h1 class="edu-title">You Fell for a<br><span class="r">Discord DM Scam</span></h1>
+    <p class="edu-sub">That message was a simulated impersonation attack — one of the most common scams in crypto. You're safe here. In the real world, this could have cost you your entire wallet balance.</p>
+    <div class="edu-alert"><div class="ea-icon">🎭</div><div class="ea-txt"><strong>What just happened</strong>A scammer created a fake "Polymarket Support" Discord account with a convincing name and STAFF tag, then DM'd you directly with urgency — a fake security alert, prize claim, or exclusive invite — to trick you into clicking a malicious link that would drain your wallet.</div></div>
+    <div class="edu-rules">
+      <div class="erule"><div class="ern" style="background:#5865F2">1</div><div class="ert"><strong>Polymarket staff NEVER send unsolicited DMs</strong>No legitimate Polymarket team member will ever initiate a private message to offer help, prizes, or urgent warnings. Ever.</div></div>
+      <div class="erule"><div class="ern" style="background:#5865F2">2</div><div class="ert"><strong>"STAFF" in a username proves nothing</strong>Anyone can set their Discord display name to "Polymarket Support". Server badges and display names are trivially faked by anyone.</div></div>
+      <div class="erule"><div class="ern" style="background:#5865F2">3</div><div class="ert"><strong>Real support only happens in public #support channels</strong>Legitimate help is always given publicly in Polymarket's official Discord server — never in a private DM initiated by "staff".</div></div>
+      <div class="erule"><div class="ern" style="background:#5865F2">4</div><div class="ert"><strong>Urgency is always a red flag</strong>Fake account suspension warnings, prize expiries, and exclusive invite deadlines are all pressure tactics to bypass your critical thinking.</div></div>
+      <div class="erule"><div class="ern" style="background:#5865F2">5</div><div class="ert"><strong>Report impersonators immediately</strong>Right-click the user in Discord → Report → Impersonation. Then notify Polymarket's moderators in the official server.</div></div>
+    </div>
+    <button class="btn-restart" style="background:#5865F2" onclick="goIntro()">🔄 Restart Quiz</button>
+  </div>
+</div>
+<div class="screen" id="s-results">
+  <div class="rwrap fade-in">
+    <div class="rheader">
+      <span class="remoji" id="remoji">🎉</span>
+      <h1 class="rtitle" id="rtitle">Well done!</h1>
+      <p class="rsub" id="rsub">Here's how you performed.</p>
+    </div>
+    <div class="scards">
+      <div class="scard hi"><div class="sclbl">Final Score</div><div class="scval" id="rscore">0</div><div class="scsub">pts</div></div>
+      <div class="scard"><div class="sclbl">Correct</div><div class="scval" id="rcorrect">0/10</div><div class="scsub">questions</div></div>
+      <div class="scard"><div class="sclbl">Accuracy</div><div class="scval" id="racc">0%</div><div class="scsub">accuracy</div></div>
+    </div>
+    <div class="lbcard">
+      <div class="lbtabs">
+        <button class="lbtab active" id="tab-today" onclick="switchTab('today')">Today's Top 10</button>
+        <button class="lbtab" id="tab-alltime" onclick="switchTab('alltime')">All-Time Top 10</button>
+      </div>
+      <div class="lblist" id="lblist"><div class="lbload">Loading leaderboard…</div></div>
+    </div>
+    <div class="ract">
+      <button class="btn-again" onclick="goIntro()">🔄 Play Again</button>
+      <button class="btn-share" onclick="shareScore()">📤 Share Score</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">📋 Copied!</div>
+
+<script>
+const Q=[
+{q:"What is Polymarket?",o:["A stock trading platform","A decentralized prediction market platform","A crypto exchange","A DeFi lending protocol"],a:1,d:"easy",e:"Polymarket is the world's largest decentralized prediction market, where users trade on real-world event outcomes using USDC."},
+{q:"What currency does Polymarket use for all trades?",o:["Bitcoin (BTC)","Ethereum (ETH)","USDC (USD Coin)","USDT (Tether)"],a:2,d:"easy",e:"Polymarket operates entirely with USDC, a stablecoin pegged 1:1 to the US dollar, ensuring stable value in your account."},
+{q:"What blockchain network does Polymarket primarily operate on?",o:["Ethereum","Solana","Polygon","Arbitrum"],a:2,d:"easy",e:"Polymarket uses the Polygon network, which enables fast transactions and very low gas fees compared to Ethereum mainnet."},
+{q:"On Polymarket, what does a share price of $0.65 represent?",o:["65 cents in profit","A 65% probability the event occurs","$65 total value","65 shares available"],a:1,d:"easy",e:"Share prices on Polymarket directly represent probabilities. $0.65 = 65% chance the outcome occurs."},
+{q:"What is the maximum payout per winning share on Polymarket?",o:["$0.50","$5.00","$1.00","Unlimited"],a:2,d:"easy",e:"Every winning share resolves at exactly $1.00 USDC. The YES+NO pair is always fully collateralized by $1.00 USDC."},
+{q:"What happens to LOSING shares when a market resolves?",o:["They pay out $0.50","They become worthless ($0.00)","They are refunded at cost","They carry over to the next market"],a:1,d:"easy",e:"When a market resolves, losing shares settle at $0.00 — they become completely worthless."},
+{q:"Can you sell your Polymarket shares before the market resolves?",o:["No, you must wait","Yes, at any time at the current market price","Only with a premium fee","Only within 24 hours of buying"],a:1,d:"easy",e:"You're never locked in. You can sell your shares at any point before resolution to lock in profits or cut losses."},
+{q:"Who do Polymarket users trade against?",o:["Polymarket itself (the house)","A centralized market maker","Other Polymarket users (peer-to-peer)","A government-backed fund"],a:2,d:"easy",e:"Polymarket is a peer-to-peer marketplace. Users trade directly against each other — there is no 'house' on the other side."},
+{q:"Does Polymarket store users' funds?",o:["Yes, in a bank account","Yes, in a hot wallet","No, funds are held in smart contracts","No, funds are held by Coinbase"],a:2,d:"easy",e:"Polymarket never custodies your funds. All money is held in smart contracts on the Polygon blockchain."},
+{q:"What does 'YES' mean when you buy it on Polymarket?",o:["You think the question will be clarified","You believe the event will happen","You are providing liquidity","You are shorting the market"],a:1,d:"easy",e:"Buying YES means you believe the event will occur. If it does, your YES shares each pay $1.00 USDC at resolution."},
+{q:"What is Polymarket's ranking in prediction markets by volume?",o:["Second largest","Third largest","World's largest","Only operates in the US"],a:2,d:"easy",e:"Polymarket is the world's largest prediction market by trading volume, processing billions of dollars in trades."},
+{q:"What does USDC stand for?",o:["Universal Stable Digital Currency","USD Coin","US Decentralized Coin","United States Digital Currency"],a:1,d:"easy",e:"USDC stands for USD Coin, a federally-regulated stablecoin issued by Circle that maintains a 1:1 peg with the US dollar."},
+{q:"What does the share price on Polymarket reflect?",o:["Polymarket's internal valuation","The current probability according to market participants","The total market volume","The time until market resolution"],a:1,d:"easy",e:"Prices on Polymarket equal probabilities. They reflect what all traders collectively believe the chances of an event are."},
+{q:"What company issues the USDC stablecoin used on Polymarket?",o:["Coinbase","Tether","Circle","Binance"],a:2,d:"easy",e:"USDC is issued by Circle, a regulated financial company. It's backed 1:1 by US dollars and US Treasury instruments."},
+{q:"How does Polymarket differ from a traditional sportsbook?",o:["It uses fiat currency","Users bet against each other, not the house","It only covers political events","Polymarket sets its own odds"],a:1,d:"easy",e:"Unlike sportsbooks, Polymarket is peer-to-peer. You trade against other users. There's no 'house' that sets odds or bans winners."},
+{q:"What does a pair of YES + NO shares always equal at resolution?",o:["$2.00 USDC","$0.50 each","$1.00 USDC total","$1.00 each"],a:2,d:"easy",e:"Every YES+NO share pair is collateralized by exactly $1.00 USDC. One wins ($1.00) and one loses ($0.00)."},
+{q:"Can Polymarket ban you for winning too much?",o:["Yes, after $10,000 in winnings","Yes, big winners get banned","No — there is no house to limit you","Only US traders have limits"],a:2,d:"easy",e:"Since there is no 'house', Polymarket cannot ban you for winning too much. You trade against other users, not the platform."},
+{q:"Can a credit/debit card be used to deposit on Polymarket?",o:["No, only crypto wallets","Yes, through MoonPay","Yes, through PayPal","Only in the US"],a:1,d:"easy",e:"Polymarket partners with MoonPay to allow users to buy USDC directly with a Visa, Mastercard, or select bank cards."},
+{q:"If YES shares trade at $0.18, what is the implied probability?",o:["82%","18%","50%","1.8%"],a:1,d:"easy",e:"On Polymarket, the share price IS the implied probability. $0.18 per share = 18% chance the event occurs."},
+{q:"What type of collateral backs all Polymarket shares?",o:["Ethereum (ETH)","Bitcoin (BTC)","Gold reserves","USDC stablecoin"],a:3,d:"easy",e:"Every share pair on Polymarket is fully collateralized by USDC. This ensures winning shares always pay exactly $1.00."},
+{q:"If you buy NO shares at $0.30 and the event does NOT happen, how much do you earn per share?",o:["$0.30","$0.70","$1.00","$0.00"],a:2,d:"easy",e:"NO shares win $1.00 each if the event does NOT occur. You paid $0.30, so you profit $0.70 per share."},
+{q:"What is the native gas token of the Polygon network?",o:["MATIC (now POL)","ETH","USDC","POLY"],a:0,d:"easy",e:"Polygon's native gas token is POL (formerly MATIC). Most Polymarket web app users don't need to manage gas themselves."},
+{q:"Who can access Polymarket market data?",o:["Only registered users","Only US users","Only premium subscribers","Anyone globally — data is public"],a:3,d:"easy",e:"Polymarket market data is publicly accessible to anyone. Only trading and deposits are restricted in certain countries."},
+{q:"Can Polymarket share prices exceed $1.00?",o:["Yes, in bull markets","No, shares always trade between $0.00 and $1.00","Yes, for highly certain outcomes","Only for multi-outcome markets"],a:1,d:"easy",e:"Never. Share prices are always strictly between $0.00 and $1.00 because they represent probabilities (0%–100%)."},
+{q:"What is MoonPay's role on Polymarket?",o:["The oracle for market resolution","A third-party on-ramp for buying USDC with a card","Polymarket's risk management team","The developer of Polymarket's smart contracts"],a:1,d:"easy",e:"MoonPay is a third-party fiat on-ramp that lets Polymarket users buy USDC with a Visa, Mastercard, or bank card."},
+{q:"What does 'NO' mean when you buy it on Polymarket?",o:["You believe the event will happen","You are providing market liquidity","You believe the event will NOT happen","You are disputing a resolution"],a:2,d:"easy",e:"Buying NO means you believe the event will not occur. If it doesn't, your NO shares each pay out $1.00 USDC at resolution."},
+{q:"What does Polymarket NOT do with user funds?",o:["Hold them in smart contracts","Allow them to be used for trading","Custody or store them on their servers","Return them at market resolution"],a:2,d:"easy",e:"Polymarket does not store or custody user funds on their servers. Funds live in smart contracts only users can access."},
+{q:"What do research studies say about prediction markets vs. expert predictions?",o:["Experts are always more accurate","Prediction markets are often MORE accurate than experts","They are equally accurate","Prediction markets are less reliable"],a:1,d:"easy",e:"Research shows prediction markets outperform polls and pundits because financial incentives push traders to be more accurate."},
+{q:"Which topics can you find prediction markets for on Polymarket?",o:["Only political elections","Only sports events","Only crypto prices","Politics, sports, crypto, economics, and more"],a:3,d:"easy",e:"Polymarket covers politics, elections, sports, crypto, economics, entertainment, and more."},
+{q:"What is Coinbase's role in the Polymarket ecosystem?",o:["It powers all Polymarket smart contracts","It's a way to buy and send USDC for deposit","It manages Polymarket's insurance fund","It resolves Polymarket markets"],a:1,d:"easy",e:"Coinbase is a popular centralized exchange where you can buy USDC and send it to your Polymarket wallet on Polygon."},
+{q:"What is a 'market' on Polymarket?",o:["A physical trading floor","A question about a future event with tradeable outcome shares","A portfolio of crypto assets","A smart contract pool for liquidity"],a:1,d:"easy",e:"A market is a question about a future real-world event (e.g., 'Will X win?') with tradeable YES and NO shares."},
+{q:"When does trading of shares stop in a market?",o:["After 30 days","When the market is resolved","When volume drops below $1,000","At the creator's discretion"],a:1,d:"easy",e:"Once a market is resolved (finalized), trading stops permanently. Holders of winning shares then redeem for $1.00 each."},
+{q:"Is Polymarket centralized or decentralized?",o:["Centralized — operated by a company","Decentralized — powered by blockchain and smart contracts","A hybrid with a central custody bank","It depends on the market type"],a:1,d:"easy",e:"Polymarket is a decentralized platform. Trades and funds are governed by smart contracts on the Polygon blockchain."},
+{q:"What makes Polymarket markets 'transparent'?",o:["All users are known to each other","Every order and price is publicly visible on the blockchain","Polymarket publishes daily reports","A government agency audits trades"],a:1,d:"easy",e:"Polymarket uses blockchain technology. Every order, trade, and market is publicly visible and verifiable."},
+{q:"What is the main use case of Polymarket for non-traders?",o:["Earning passive income","Real-time probability signals on world events","Storing crypto safely","Building DeFi portfolios"],a:1,d:"easy",e:"Beyond trading, Polymarket provides real-time probabilities for events — used by journalists, researchers, and analysts."},
+{q:"How does buying shares on Polymarket affect the price?",o:["It has no effect on price","Buying YES shares increases the implied probability","It only affects liquidity, not price","Polymarket sets prices manually"],a:1,d:"easy",e:"Each trade shifts supply and demand, changing the share price. Increased buying of YES pushes the probability up."},
+{q:"What is a 'share' on Polymarket?",o:["A traditional equity share","A token representing a belief in an event outcome","A unit of USDC","An NFT for a specific market"],a:1,d:"easy",e:"Shares are ERC-1155 tokens representing a position in a specific event outcome (YES or NO). They're worth $0–$1 at resolution."},
+{q:"Why can you sell shares early on Polymarket?",o:["To avoid taxes","To lock in profits or cut losses before the event resolves","Because Polymarket requires it","To transfer to another user"],a:1,d:"easy",e:"Since it's a live market, prices change as new information emerges. Selling early lets you realize gains or limit losses."},
+{q:"What is the minimum price of a share on Polymarket?",o:["$0.00 (approaching zero)","$0.10","$1.00","$0.50"],a:0,d:"easy",e:"Shares are priced between $0.00 and $1.00 USDC. Very unlikely outcomes can trade at just fractions of a cent."},
+{q:"What is a 'prediction market'?",o:["A traditional stock exchange focused on tech","A platform where users trade on real-world event outcomes","A futures market for commodities","A decentralized autonomous organization"],a:1,d:"easy",e:"Prediction markets let users trade on the outcomes of real-world events, with prices reflecting collective probability estimates."},
+{q:"What does Polymarket collect a fee on?",o:["Deposits only","Withdrawals only","Each matched transaction","Monthly membership"],a:2,d:"easy",e:"Instead of acting as a bookmaker, Polymarket collects a small fee on each matched transaction between users."},
+{q:"What is the term for the person on the other side of your trade?",o:["The house","The dealer","A counterparty (another user)","The oracle"],a:2,d:"easy",e:"Your counterparty is another Polymarket user who took the opposing side of your bet — the essence of peer-to-peer markets."},
+{q:"If you believe an event has a higher probability than the share price suggests, what should you do?",o:["Sell your shares","Buy YES shares","Buy NO shares","Propose market resolution"],a:1,d:"easy",e:"If you think the true probability is higher than the current price, buying YES gives you a profitable edge if you're right."},
+{q:"What does it mean to 'go long' on YES shares?",o:["You are shorting the market","You hold shares that profit if the event occurs","You are providing market liquidity","You are proposing resolution"],a:1,d:"easy",e:"Being 'long' on YES means you hold shares that become worth $1.00 if the event happens."},
+{q:"What happens to share prices as more traders take positions?",o:["Prices become more stable and accurate","Prices always go up","Prices always go down","Prices become random"],a:0,d:"easy",e:"More active trading brings more information and arbitrage, making prices increasingly accurate reflections of true probabilities."},
+{q:"What is the primary way prediction markets 'aggregate' information?",o:["By surveying experts daily","Through financial incentives that reward accurate forecasting","Via government statistical data","By AI algorithm analysis"],a:1,d:"easy",e:"Financial incentives drive traders to research and trade accurately, aggregating diverse knowledge into precise probability estimates."},
+{q:"Which of these is Polymarket NOT?",o:["A prediction market","A peer-to-peer trading platform","A casino or sportsbook (the house)","A blockchain-based platform"],a:2,d:"easy",e:"Polymarket explicitly states it is NOT 'the house'. There's no Polymarket entity on the other side of your trade."},
+{q:"Does Polymarket have a mobile app?",o:["No, desktop only","Yes, iOS app available","Yes, iOS and Android apps","Only an Android beta"],a:1,d:"easy",e:"Polymarket has an iOS app. Note that trading may be unavailable in certain regions even if the app is accessible."},
+{q:"What is the relationship between supply, demand, and share prices on Polymarket?",o:["Prices are fixed by Polymarket","Supply and demand from users determines prices, like a stock exchange","Only demand affects prices","Prices only change after major news events"],a:1,d:"easy",e:"Just like stock exchanges, Polymarket doesn't set prices. Prices are purely a function of supply and demand from all users."},
+{q:"What does it mean to be 'short' a position on Polymarket?",o:["Holding short-duration bonds","Holding shares that profit if the event does NOT occur (NO shares)","A leveraged position against the market","Selling shares you don't own"],a:1,d:"easy",e:"Being 'short' means holding NO shares — you profit if the event doesn't happen. NO shares pay $1.00 if the outcome is NO."},
+{q:"Which oracle protocol does Polymarket use to resolve markets on its international platform?",o:["Chainlink only","UMA Optimistic Oracle","Band Protocol","API3"],a:1,d:"medium",e:"Polymarket uses UMA's Optimistic Oracle (OO) to resolve markets on Polymarket International in a permissionless, decentralized way."},
+{q:"What framework are Polymarket's outcome shares built on?",o:["ERC-20 token standard","OpenZeppelin ERC-721","Gnosis Conditional Tokens Framework (CTF)","Uniswap AMM framework"],a:2,d:"medium",e:"Polymarket shares are built on Gnosis's Conditional Tokens Framework (CTF), which enables binary and multi-outcome event markets."},
+{q:"How much USDC bond must you post to propose a market resolution?",o:["$100","$250","$500","$750"],a:3,d:"medium",e:"Proposing a market resolution requires posting a $750 USDC bond. You lose this if your proposal is successfully disputed."},
+{q:"What reward does a successful resolution proposer receive?",o:["$100","$50","$2 plus their bond back","5% of the market's volume"],a:2,d:"medium",e:"A successful proposer gets their $750 bond back plus a $2 USDC reward for providing the resolution data."},
+{q:"What is a 'limit order' on Polymarket?",o:["An order that executes immediately","An order to buy/sell at a specific price or better","An order that expires in 24 hours","An order restricted to verified users"],a:1,d:"medium",e:"A limit order lets you specify the exact price at which you want to buy or sell shares. It sits in the order book until matched."},
+{q:"What is a 'market order' on Polymarket?",o:["An order tied to market cap thresholds","An order to open a new market","An order that executes immediately at the best available price","A limit order with a 1-hour expiry"],a:2,d:"medium",e:"A market order executes immediately at the best price currently available in the order book, regardless of exact price."},
+{q:"For standard web app users, how are gas fees handled on Polymarket?",o:["Users pay gas in POL directly","Polymarket deducts gas from USDC balance","Gas is paid by a relayer on the user's behalf — trading feels 'gasless'","Gas is sponsored by Coinbase"],a:2,d:"medium",e:"Polymarket uses a relayer architecture. The relayer pays on-chain gas on your behalf, so standard web app trading feels gasless."},
+{q:"What is a 'relayer' in Polymarket's system?",o:["A government regulatory body","An entity that executes transactions and pays gas on users' behalf","A market creator tool","A way to bridge USDC from Ethereum"],a:1,d:"medium",e:"A relayer is a service that submits your transactions to the blockchain and covers the gas cost, abstracting complexity from users."},
+{q:"What is a 'taker fee' on Polymarket?",o:["Fee for depositing funds","Fee for withdrawing winnings","Fee paid by users whose orders take existing liquidity from the book","Fee for proposing resolution"],a:2,d:"medium",e:"Taker fees apply to orders that immediately take liquidity from the order book (e.g., buying at the current ask price)."},
+{q:"What is a 'maker fee' on Polymarket?",o:["Fee for creating a new market","Fee charged to users who add liquidity to the order book via limit orders","Fee for cancelling orders","Fee for claiming winnings"],a:1,d:"medium",e:"Maker fees apply to limit orders that add liquidity to the order book. Market makers pay this fee when their limit orders are filled."},
+{q:"Are sell orders subject to taker fees on Polymarket?",o:["Yes, same fee as buy orders","No, sell orders are NOT subject to taker fees","Yes, but at a reduced rate","Only for positions larger than $500"],a:1,d:"medium",e:"Sell orders are explicitly not subject to taker fees on Polymarket. Only buy-side taker orders incur this fee."},
+{q:"For Polymarket Sports markets created after March 30, 2026, what is the peak effective fee?",o:["0.25% at the 50/50 price point","0.50% at the 50/50 price point","0.75% at the 50/50 price point","1.00% at the 50/50 price point"],a:2,d:"medium",e:"Starting March 30, 2026, Polymarket Sports markets use an updated fee structure with a peak effective fee of 0.75% at the 50/50 price."},
+{q:"Can users in Italy trade on Polymarket?",o:["Yes, with no restrictions","Yes, but with a 5% surcharge","No, trading is restricted in Italy","Only in limit order mode"],a:2,d:"medium",e:"Italian users cannot trade on Polymarket. Trading is restricted in Italy, though users can still view market data."},
+{q:"What can German users do on Polymarket?",o:["Full trading access","Only buy YES shares","View data and hold existing positions to resolution — no new trades","Nothing — Germany is fully blocked"],a:2,d:"medium",e:"Germany prohibits trading on Polymarket. Existing positions can be held until resolution and redeemed, but no new positions allowed."},
+{q:"Is using a VPN to bypass Polymarket's geographic restrictions allowed?",o:["Yes, it's a grey area","Yes, if used for privacy only","No, it violates Polymarket's Terms of Service (Section 2.1.4)","Only for view-only access"],a:2,d:"medium",e:"Polymarket strictly prohibits VPN usage to bypass geo-restrictions. It's a clear ToS violation (Section 2.1.4) and can result in penalties."},
+{q:"What is the Conditional Tokens Framework (CTF)?",o:["A Polymarket fee management system","A Gnosis protocol for creating and managing binary/multi-outcome event tokens","A Chainlink price feed interface","An Ethereum token standard for NFTs"],a:1,d:"medium",e:"The Gnosis CTF is the underlying framework Polymarket uses to mint and manage YES/NO outcome tokens for each prediction market."},
+{q:"What does 'UMA' stand for?",o:["Unified Market Access","Universal Market Access","User Managed Assets","Unbiased Market Algorithm"],a:1,d:"medium",e:"UMA stands for Universal Market Access — the oracle protocol that Polymarket uses to resolve markets decentrally."},
+{q:"What happens when a UMA resolution is disputed?",o:["The market auto-resolves to 50/50","UMA token holders vote on the correct outcome via the DVM","Polymarket's team resolves it manually","The dispute is ignored"],a:1,d:"medium",e:"A disputed resolution escalates to UMA's Data Verification Mechanism (DVM), where UMA token holders vote on the correct outcome."},
+{q:"What is an 'order book' on Polymarket?",o:["A record of all proposed resolutions","A registry of all Polymarket markets","A listing of all buy and sell orders for a market's outcome","A history of completed trades"],a:2,d:"medium",e:"An order book shows all open buy and sell orders at various prices, making supply and demand visible to all users."},
+{q:"What is the approximate fee MoonPay charges for card purchases of USDC?",o:["0%","~1%","~3.5%","~10%"],a:2,d:"medium",e:"MoonPay charges approximately 3.5% for card purchases. So a $100 card deposit yields about $96.50 in USDC to trade with."},
+{q:"Which specific network must you use when sending USDC to Polymarket?",o:["Ethereum mainnet","Arbitrum","Polygon network","Solana"],a:2,d:"medium",e:"Always send USDC on the Polygon network to Polymarket. Sending on Ethereum mainnet or other chains can result in permanently lost funds."},
+{q:"What happens if you accidentally send USDC via Ethereum mainnet to Polymarket?",o:["It auto-converts to Polygon","Funds are lost permanently","Polymarket refunds within 7 days","You need to pay a bridge fee to recover"],a:1,d:"medium",e:"Polymarket warns strongly: sending USDC on Ethereum mainnet to your Polymarket address can result in funds being lost."},
+{q:"What is the 'liveness period' in UMA's Optimistic Oracle?",o:["The time markets are open for trading","~2 hours after a resolution is proposed before it's considered final","The 30-day dispute window","The time for a DVM vote to complete"],a:1,d:"medium",e:"After a resolution is proposed, there's a ~2-hour liveness period. If undisputed, the resolution is finalized automatically."},
+{q:"What does the Chainlink oracle do for Polymarket?",o:["Resolves all election markets","Settles disputes between users","Resolves markets based on real-time numerical data (like crypto prices)","Provides Polymarket's KYC data"],a:2,d:"medium",e:"Chainlink's decentralized price feeds are used to resolve Polymarket markets that depend on precise real-time numbers, like crypto asset prices."},
+{q:"Has Polymarket officially released its own token (e.g., $POLY or $PM)?",o:["Yes, $POLY launched in 2023","Yes, $PM launched in 2024","No official token has been released","Yes, a governance token called $PMK"],a:2,d:"medium",e:"As of the current date, Polymarket has NOT released an official token. Any $POLY or $PM airdrop claims are scams."},
+{q:"What is a 'proxy wallet' on Polymarket?",o:["A hardware wallet integration","An embedded smart contract wallet that enables seamless trading without managing private keys manually","A read-only view wallet","A multi-signature corporate wallet"],a:1,d:"medium",e:"Polymarket uses proxy wallets — smart contract accounts that let users trade without dealing with raw private keys or gas management."},
+{q:"What does 'geographic restriction' based on 'physical location' mean on Polymarket?",o:["Your registered address determines access","Your IP address and physical location determine access, regardless of residency","Your nationality determines access","Your bank country determines access"],a:1,d:"medium",e:"Polymarket restrictions are based on where you physically are, not where you live. Travelers can trade in permitted countries."},
+{q:"Can users from Ontario, Canada trade on Polymarket?",o:["Yes, Canada has full access","Yes, but only with a VPN","No, trading is unavailable in Ontario specifically","No, all of Canada is blocked"],a:2,d:"medium",e:"Ontario, Canada is specifically restricted from trading on Polymarket. Other Canadian provinces may have different access rules."},
+{q:"What fee does Polymarket charge for withdrawals?",o:["1% of the withdrawn amount","0.5% flat fee","No Polymarket platform fee (only network gas fees apply)","$5 flat withdrawal fee"],a:2,d:"medium",e:"Polymarket charges zero platform fees for withdrawals. You only pay the minimal Polygon gas fee, typically under $0.01."},
+{q:"What is the 'Data Verification Mechanism' (DVM) in UMA?",o:["A tool for verifying user identity","The backstop dispute resolution system where UMA token holders vote","A data API for Polymarket's order book","A smart contract auditing system"],a:1,d:"medium",e:"The DVM is UMA's ultimate dispute resolution system. When disputes are escalated, UMA token holders vote to determine the correct outcome."},
+{q:"Which best describes Polymarket's order book structure?",o:["Automated Market Maker (AMM) like Uniswap","A Central Limit Order Book (CLOB) with off-chain matching and on-chain settlement","A simple auction system","A Dutch auction"],a:1,d:"medium",e:"Polymarket uses a CLOB (Central Limit Order Book) where orders are matched off-chain for speed and then settled on-chain for security."},
+{q:"What is the difference between Polymarket US and Polymarket International?",o:["They use different stablecoins","US uses Polymarket's Markets Team for resolution; International uses UMA Oracle","International has lower fees","US has a different token standard"],a:1,d:"medium",e:"Polymarket US uses the internal Markets Team to resolve markets. Polymarket International (the global version) uses the UMA Optimistic Oracle."},
+{q:"What are 'Liquidity Rewards' on Polymarket?",o:["Bonuses for first-time deposits","Payments given to market makers who provide liquidity to markets","Rewards for sharing Polymarket on social media","Interest earned on USDC holdings"],a:1,d:"medium",e:"Liquidity Rewards are paid to users who provide liquidity to Polymarket markets, encouraging tighter spreads and better pricing."},
+{q:"What ERC standard are Polymarket's outcome shares?",o:["ERC-20","ERC-721 (NFT)","ERC-1155","ERC-4626"],a:2,d:"medium",e:"Polymarket shares use the ERC-1155 multi-token standard, allowing many different token types (each outcome) under a single contract."},
+{q:"What does 'oracle-agnostic' mean for Polymarket?",o:["Polymarket uses no oracle","Polymarket can use different oracle systems, not just UMA","Polymarket relies exclusively on Chainlink","Oracle selection is done by governance vote"],a:1,d:"medium",e:"Polymarket is oracle-agnostic — its core system supports multiple oracle sources (UMA, Chainlink, Markets Team) depending on market type."},
+{q:"How does Polymarket ensure market resolution rules are clear?",o:["Rules are set by government regulators","Each market has pre-defined resolution rules published under the order book","Rules are determined after the event","Users vote on resolution criteria before trading"],a:1,d:"medium",e:"Every Polymarket market has clear, pre-defined resolution rules published under the order book, visible to all traders before they buy shares."},
+{q:"Why might a trader choose Polymarket over traditional polls for event probabilities?",o:["Polymarket polls are more scientific","Financial incentives make Polymarket traders more accurate than poll respondents","Polymarket has more participants than polls","Polls are illegal in many countries"],a:1,d:"medium",e:"Financial incentives force Polymarket traders to put money behind their beliefs, making them more rigorous and accurate than free survey polls."},
+{q:"What approximate Polygon gas fee applies for a standard Polymarket withdrawal?",o:["$1-5","$10-20","Under $0.01","$0.50-1.00"],a:2,d:"medium",e:"Polygon network gas fees are extremely low. A typical Polymarket withdrawal costs well under $0.01 in gas."},
+{q:"What are 'Holding Rewards' on Polymarket?",o:["Bonuses for depositing USDC monthly","Interest on idle USDC in your wallet","Incentives earned by holding shares during certain periods","Rewards for inviting new users"],a:2,d:"medium",e:"Holding Rewards are incentives distributed to users who hold market shares for set periods, rewarding long-term position holders."},
+{q:"What are OFAC-sanctioned countries in the context of Polymarket?",o:["Countries where Polymarket offers special discounts","Countries fully blocked from using Polymarket","Countries with lower fees","Countries where Polymarket only offers read access"],a:1,d:"medium",e:"OFAC-sanctioned countries are fully blocked from accessing Polymarket's trading services as required by US law and compliance."},
+{q:"What is the 'Maker Rebates Program' on Polymarket?",o:["A loyalty program for new users","A program that pays market makers for providing liquidity","A rebate for users who resolve markets","A fee discount for large depositors"],a:1,d:"medium",e:"The Maker Rebates Program rewards market makers who place limit orders that add liquidity to the order book with rebates on their fees."},
+{q:"What happens to your funds on Polymarket when you're not trading?",o:["They earn yield automatically","They sit in your proxy wallet in USDC on Polygon","Polymarket invests them for additional returns","They revert to fiat currency"],a:1,d:"medium",e:"Uninvested USDC sits in your Polymarket proxy wallet on Polygon, doing nothing. It's not invested or yield-bearing on Polymarket itself."},
+{q:"What is the relayer fee formula for large Ethereum mainnet deposits?",o:["$1 flat","$3 + network fee OR 0.3% of deposit, whichever is higher","1% of deposit","$10 flat fee"],a:1,d:"medium",e:"The relayer fee is $3 + network fee OR 0.3% of the deposit amount, whichever is higher. For large deposits, 0.3% kicks in."},
+{q:"Can Polish (Poland) users open new positions on Polymarket?",o:["Yes, full access","No — only close existing positions and view data","No, Poland is fully blocked","Only sports markets are restricted"],a:1,d:"medium",e:"Polish users may view market data and close existing positions, but cannot open new positions on Polymarket."},
+{q:"What is the 'UmaCtfAdapter' smart contract?",o:["A UI adapter for Polymarket's mobile app","A custom contract bridging UMA's Optimistic Oracle data to resolve CTF conditions","A token bridge between Polygon and Ethereum","A market creation wizard"],a:1,d:"advanced",e:"Polymarket developed the UmaCtfAdapter as a custom interface between UMA's OO and the Gnosis CTF system, enabling decentralized resolution."},
+{q:"What is UMIP-189?",o:["UMA's token price proposal","The governance proposal that upgraded Polymarket to Managed Optimistic Oracle V2 (MOOV2)","A KYC compliance framework","A proposal to add Chainlink to UMA"],a:1,d:"advanced",e:"UMIP-189 is the governance proposal that transitioned Polymarket's oracle from OOV2 to MOOV2, creating a vetted whitelist of resolution proposers."},
+{q:"What is MOOV2 (Managed Optimistic Oracle V2)?",o:["Polymarket's second-generation mobile app","An oracle upgrade that restricts resolution proposals to a whitelist of vetted addresses","A token standard for multi-outcome markets","A second USDC deposit address for Polymarket"],a:1,d:"advanced",e:"MOOV2 restricts who can propose market resolutions to a vetted whitelist of 37 addresses, reducing bad proposals and delays."},
+{q:"How many addresses are on the MOOV2 whitelist of resolution proposers?",o:["10","22","37","50"],a:2,d:"advanced",e:"The MOOV2 whitelist includes 37 vetted addresses, including Risk Labs and Polymarket employees, as the only direct resolution proposers."},
+{q:"What is an 'escalation game' in the context of UMA's Optimistic Oracle?",o:["A fee structure that increases for large trades","The system where disputed resolutions escalate from proposers to DVM voters","A penalty system for bad behavior","A multi-round auction for market creation"],a:1,d:"advanced",e:"UMA's OO uses an escalation game: undisputed proposals are accepted; disputed ones escalate to the DVM where token holders vote."},
+{q:"What happens to a Polymarket market when its first UMA resolution dispute occurs?",o:["The market is automatically cancelled","A new Optimistic Oracle request is issued (market is reset)","UMA token holders immediately vote","The Markets Team overrides the resolution"],a:1,d:"advanced",e:"On the first dispute, the market is automatically reset — a new OO request is sent. This prevents obviously incorrect disputes from causing delays."},
+{q:"What is an 'Externally Owned Account' (EOA) in Polymarket context?",o:["A Polymarket corporate account","A standard crypto wallet (like MetaMask) controlled by a private key","A multi-signature corporate wallet","An account managed by a relayer"],a:1,d:"advanced",e:"An EOA is a standard externally-controlled wallet (like MetaMask). EOA users interacting directly with Polymarket contracts must pay gas in POL."},
+{q:"What is 'collateralization' in the context of Polymarket's CTF?",o:["Polymarket's insurance against market manipulation","The mechanism where each YES+NO pair is backed by exactly $1.00 USDC","The fee reserve fund","A DeFi lending feature"],a:1,d:"advanced",e:"Collateralization means every YES+NO pair is backed by exactly $1.00 USDC. This guarantees that winning shares always pay $1.00."},
+{q:"What is a 'binary market' vs a 'multi-outcome market' on Polymarket?",o:["Binary = two outcomes (YES/NO); Multi = more than two outcomes","Binary = unlimited shares; Multi = capped shares","Binary = resolves faster; Multi = requires extra bond","They are identical in structure"],a:0,d:"advanced",e:"Binary markets have exactly two outcomes (YES/NO). Multi-outcome markets have 3+ possible outcomes, each with its own tradeable share."},
+{q:"How does the UMA DVM resolve a dispute?",o:["By averaging proposer and disputer valuations","UMA token holders vote over several days on the correct outcome","A random oracle is selected","Polymarket's legal team determines it"],a:1,d:"advanced",e:"The DVM is UMA's token-holder governance mechanism. After a dispute is escalated, UMA token holders vote over a few days to determine truth."},
+{q:"What does 'ancillary data' refer to in UMA oracle requests?",o:["Additional user KYC data","Metadata that defines the market's resolution criteria, including the question and rules","Historical trading data for a market","Cross-chain asset pricing data"],a:1,d:"advanced",e:"Ancillary data is the metadata attached to each UMA oracle request defining exactly what question is being asked and the resolution rules."},
+{q:"If a market resolves as 'N/A' (ambiguous/cancelled), how do shares settle?",o:["All shares become $0.00","All shares become $1.00","Both YES and NO shares resolve at $0.50 each","The market reopens with new rules"],a:2,d:"advanced",e:"When a market resolves N/A (usually due to ambiguity or event not occurring as defined), both YES and NO shares settle at $0.50 each."},
+{q:"What is the 'CTFExchange' contract?",o:["The Polymarket frontend interface contract","The smart contract that matches buy/sell orders for conditional tokens","The fee collection smart contract","The oracle adapter for Chainlink integration"],a:1,d:"advanced",e:"The CTFExchange is Polymarket's core smart contract that manages the on-chain settlement of matched conditional token trades."},
+{q:"What is the role of UMA token holders in Polymarket's resolution process?",o:["They propose resolutions on all markets","They are impartial arbiters who vote in DVM disputes to determine the correct outcome","They create new markets on Polymarket","They verify user identities"],a:1,d:"advanced",e:"UMA token holders serve as the ultimate source of truth for disputed markets. They vote impartially via the DVM when disputes escalate."},
+{q:"What is the approximate total Polymarket trading volume during the 2024 US election cycle?",o:["$350 million","$1.5 billion","$3.5 billion+","$10 billion"],a:2,d:"advanced",e:"Polymarket processed over $3.5 billion in trading volume during the 2024 US presidential election cycle alone — a record for prediction markets."},
+{q:"What is 'smart contract risk' for Polymarket users?",o:["Risk that Polymarket changes its fee structure","Risk that bugs in Polymarket's smart contracts could affect user funds","Risk that the UMA oracle gives wrong outcomes","Risk of losing funds to inflation"],a:1,d:"advanced",e:"Smart contract risk is the possibility that bugs or vulnerabilities in Polymarket's code could be exploited, potentially affecting user funds."},
+{q:"Why does Polymarket's CLOB use off-chain matching?",o:["To avoid Polygon network fees entirely","For speed and cost efficiency — on-chain matching would be too slow and expensive","Because Polygon doesn't support on-chain matching","To maintain centralized control of order flow"],a:1,d:"advanced",e:"On-chain matching for every order would be extremely slow and costly. Off-chain matching enables high-frequency, low-latency order flow with on-chain security."},
+{q:"What is a 'market clarification' on Polymarket?",o:["A price adjustment by Polymarket's team","An official statement clarifying ambiguous resolution rules for a specific market","A change to the market's end date","A dispute filed by a user"],a:1,d:"advanced",e:"Market clarifications are official statements by the Markets Team that explain how ambiguous or edge-case scenarios will be treated for resolution."},
+{q:"In which scenario does a resolution go to UMA's DVM for voting?",o:["All resolutions go to DVM","Only the first dispute triggers DVM voting","When a resolution is disputed a second time, indicating fundamental disagreement","When the bond is less than $750"],a:2,d:"advanced",e:"The DVM is triggered on the second dispute. The first dispute simply resets the oracle request. The second signals a deeper disagreement requiring a vote."},
+{q:"What ensures Polymarket's prices cannot be easily manipulated?",o:["Polymarket's legal team monitors trades","Financial incentives attract informed traders who arbitrage away mispricing","Government regulation","A circuit breaker mechanism"],a:1,d:"advanced",e:"Informed traders profit by correcting mispriced markets through arbitrage. This economic incentive keeps prices accurate and manipulation-resistant."},
+{q:"What is the 'liveness period' in UMA designed to prevent?",o:["Slow resolution due to low proposer turnout","Obviously wrong proposals from being instantly finalized — it gives time to dispute","Excessive trading during resolution","Market manipulation through large last-second trades"],a:1,d:"advanced",e:"The 2-hour liveness period gives the community time to review and dispute incorrect proposals before they're finalized, preventing bad resolutions."},
+{q:"What makes ERC-1155 ideal for Polymarket's conditional tokens?",o:["It supports fractional NFT ownership","It allows multiple token types under one contract, making it efficient for many YES/NO pairs","It has built-in cross-chain bridging","It uses less gas than ERC-20 for single transfers"],a:1,d:"advanced",e:"ERC-1155 supports many different token types (each market's YES and NO) under one contract, making it perfectly efficient for prediction market shares."},
+{q:"How does Polymarket guarantee winning shares ALWAYS pay exactly $1.00?",o:["Polymarket reserves a separate insurance fund","Every YES+NO pair is fully collateralized by $1.00 USDC at share creation","Chainlink price feeds ensure the payout","UMA verifies each payout individually"],a:1,d:"advanced",e:"Full collateralization is the key: when any YES+NO pair is created, $1.00 USDC is locked as collateral. One wins ($1.00), one loses ($0.00) — always $1.00 total."},
+{q:"What is the strategic role of 'market makers' on Polymarket?",o:["They create new prediction markets","They provide liquidity by placing limit orders on both sides, enabling other users to trade easily","They resolve markets as proposers","They verify user identities"],a:1,d:"advanced",e:"Market makers post limit orders on both sides of a market, creating liquidity. Without them, traders couldn't easily enter or exit positions."},
+{q:"What does Polymarket's relationship with UMA ensure about market resolution?",o:["Polymarket controls all resolution outcomes","Resolution can happen permissionlessly and decentrally, without Polymarket's involvement","UMA guarantees instant resolution","Resolution is always completed within 1 hour"],a:1,d:"advanced",e:"UMA's OO allows whitelisted proposers to propose resolutions, making the process permissionless and independent of Polymarket's team."},
+{q:"In Polymarket's CTF, what does each ERC-1155 tokenId represent?",o:["A unique user account","A specific outcome of a specific market","The total collateral in a market","A governance voting right"],a:1,d:"advanced",e:"Each ERC-1155 tokenId in Polymarket's CTF uniquely identifies a specific outcome (YES or NO) for a specific prediction market."},
+{q:"If you interact with Polymarket contracts directly from an EOA, what do you need?",o:["Extra USDC for fees","POL tokens to pay gas directly","A Polymarket API key","An approved whitelist address"],a:1,d:"advanced",e:"Direct EOA interaction bypasses the relayer, so you must hold POL (Polygon's native token) to pay gas fees yourself."},
+{q:"What is the primary benefit of Polymarket's hybrid off-chain/on-chain architecture?",o:["Eliminates blockchain fees entirely","Combines off-chain speed with on-chain transparency and settlement finality","Allows Polymarket to set prices internally","Makes geographic restrictions easier to enforce"],a:1,d:"advanced",e:"The hybrid model gets the best of both worlds: off-chain matching is fast and cheap, while on-chain settlement guarantees transparency and security."},
+{q:"What is a 'conditional token' in the Gnosis CTF?",o:["A token that earns conditional yield","A token whose value is conditioned on the outcome of a specified event","A governance token with time-locked voting","A synthetic asset pegged to a condition"],a:1,d:"advanced",e:"Conditional tokens are ERC-1155 tokens whose value (0 or $1) is entirely conditioned on the outcome of the real-world event they represent."},
+{q:"How does the off-chain matching engine on Polymarket work?",o:["It uses AI to match orders predictively","Orders are matched off-chain for speed and efficiency, then settled on the Polygon blockchain","Matching is done by smart contracts in real-time on-chain","It uses a traditional centralized database"],a:1,d:"advanced",e:"Polymarket's hybrid architecture matches orders off-chain (fast and cheap) while final settlement happens on Polygon's blockchain (secure and transparent)."},
+];
+
+/* ── STATE ── */
+let quiz=[],cur=0,score=0,correct=0,username='',tmr=null,tLeft=15,answered=false,activeTab='today';
+let airdropAt=-1,discordAt=-1,airdropShown=false,discordShown=false,dcScenario=null,safeTimer=null;
+
+const DC_SCENARIOS=[
+  {name:"Polymarket Support",init:"PS",prev:"Hey — I'm from Polymarket's Trust & Safety team regarding your account...",msgs:["Hey! I'm reaching out from Polymarket's Trust & Safety team. We've flagged some unusual trading activity on your account.","To prevent a temporary account suspension, we need to verify your connected wallet within the next 15 minutes. This is standard security procedure.","Please use the link below to complete verification and keep your account active. This takes less than 60 seconds."],cta:"Verify Wallet to Avoid Suspension",ctaC:"#ed4245"},
+  {name:"Polymarket Research",init:"PR",prev:"Hey — you've been selected for our private alpha group...",msgs:["Hey! I'm from Polymarket's internal research team. We identify high-volume traders and share exclusive market intelligence with them directly.","Based on your recent activity, you've been handpicked for our private alpha channel — early access to data before it goes public on the platform.","This is strictly invite-only and spots are almost full. Click below before the link expires."],cta:"Join Private Alpha Channel",ctaC:"#3ba55c"},
+  {name:"Polymarket Rewards",init:"PR",prev:"Congratulations! You've been selected as a giveaway winner...",msgs:["Congratulations! Your account was randomly selected as one of our monthly community giveaway winners!","You've won 500 USDC as part of our Community Rewards Program. We just need to verify your identity before we can process the transfer.","Click below to claim your prize. This offer expires in 10 minutes and cannot be reissued to another account."],cta:"Claim My 500 USDC Prize",ctaC:"#faa81a"},
+  {name:"Polymarket Security",init:"PS",prev:"Security Alert: Suspicious login detected on your Polymarket account...",msgs:["Security Alert: We detected a login attempt on your Polymarket account from an unrecognized device just 4 minutes ago.","For your protection, we've temporarily flagged your account. You need to complete a quick identity verification to restore full access and secure your funds.","Please verify your identity now. Waiting increases the risk of unauthorized access to your positions."],cta:"Secure My Account Now",ctaC:"#ed4245"}
+];
+const CIRC=2*Math.PI*22;
+
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=0|Math.random()*(i+1);[r[i],r[j]]=[r[j],r[i]];}return r;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+document.getElementById('uinput').addEventListener('input',function(){document.getElementById('btn-start').disabled=this.value.trim().length<2;});
+document.getElementById('uinput').addEventListener('keydown',function(e){if(e.key==='Enter'&&this.value.trim().length>=2)startQuiz();});
+
+function startQuiz(){
+  username=document.getElementById('uinput').value.trim();
+  if(!username||username.length<2)return;
+  const e=shuffle(Q.filter(q=>q.d==='easy'));
+  const m=shuffle(Q.filter(q=>q.d==='medium'));
+  const a=shuffle(Q.filter(q=>q.d==='advanced'));
+  quiz=shuffle([...e.slice(0,4),...m.slice(0,4),...a.slice(0,2)]);
+  cur=0;score=0;correct=0;answered=false;airdropShown=false;discordShown=false;
+  dcScenario=DC_SCENARIOS[0|Math.random()*DC_SCENARIOS.length];
+
+  // ── DUAL SCAM SCHEDULE: at least one fires, 40% chance both fire ──
+  const both=Math.random()<0.4;
+  if(both){
+    const fq=2+Math.floor(Math.random()*2); // Q3 or Q4
+    const sq=fq+2+Math.floor(Math.random()*2); // 2-3 later
+    if(Math.random()<0.5){airdropAt=fq;discordAt=sq;}else{discordAt=fq;airdropAt=sq;}
+  } else {
+    const tq=2+Math.floor(Math.random()*4); // Q3-Q6
+    if(Math.random()<0.5){airdropAt=tq;discordAt=-1;}else{discordAt=tq;airdropAt=-1;}
+  }
+  document.getElementById('lscore').textContent='0';
+  document.getElementById('nav-pts').textContent='';
+  showScreen('s-quiz');renderQ();
+}
+
+function renderQ(){
+  const q=quiz[cur];answered=false;tLeft=15;
+  document.getElementById('qnum').innerHTML=`${cur+1} <span>/ 10</span>`;
+  document.getElementById('prog').style.width=`${(cur/10)*100}%`;
+  const b=document.getElementById('dbadge');
+  b.className='dbadge '+q.d;
+  b.textContent=q.d==='easy'?'● Easy':q.d==='medium'?'◆ Medium':'▲ Advanced';
+  document.getElementById('qtxt').textContent=q.q;
+  const g=document.getElementById('ogrid');g.innerHTML='';
+  const L=['A','B','C','D'];
+  shuffle([0,1,2,3]).forEach((oi,pos)=>{
+    const btn=document.createElement('button');
+    btn.className='opt';btn.setAttribute('data-oi',oi);
+    btn.innerHTML=`<span class="oltr">${L[pos]}</span>${q.o[oi]}`;
+    btn.onclick=()=>pick(btn,oi);g.appendChild(btn);
+  });
+  document.getElementById('expbox').classList.remove('show');
+  const nb=document.getElementById('btn-next');nb.classList.remove('show');
+  nb.textContent=cur<9?'Next Question →':'See My Results →';
+  resetTmr();startTmr();
+  document.getElementById('qcard').classList.remove('shake');
+  void document.getElementById('qcard').offsetWidth;
+}
+
+function resetTmr(){clearInterval(tmr);tLeft=15;updateTmrUI();}
+function updateTmrUI(){
+  const arc=document.getElementById('tarc'),num=document.getElementById('tnum');
+  arc.style.strokeDashoffset=CIRC*(1-tLeft/15);
+  if(tLeft<=5){arc.style.stroke='#ff3d57';num.style.color='#ff3d57';}
+  else if(tLeft<=9){arc.style.stroke='#ffc533';num.style.color='#ffc533';}
+  else{arc.style.stroke='#0038ff';num.style.color='var(--text)';}
+  num.textContent=tLeft;
+}
+function startTmr(){tmr=setInterval(()=>{tLeft--;updateTmrUI();if(tLeft<=0){clearInterval(tmr);timeOut();}},1000);}
+
+function pick(btn,oi){
+  if(answered)return;answered=true;clearInterval(tmr);
+  const q=quiz[cur];
+  document.querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));
+  if(oi===q.a){
+    btn.classList.add('correct');score+=100+(tLeft*5);correct++;
+    document.getElementById('lscore').textContent=score.toLocaleString();
+    document.getElementById('nav-pts').textContent=score.toLocaleString()+' pts';
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('qcard').classList.add('shake');
+    document.querySelectorAll('.opt').forEach(b=>{if(+b.getAttribute('data-oi')===q.a)b.classList.add('correct');});
+  }
+  showExp(oi===q.a,q.e);showNB();checkScams();
+}
+
+function timeOut(){
+  if(answered)return;answered=true;
+  const q=quiz[cur];
+  document.querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(+b.getAttribute('data-oi')===q.a)b.classList.add('correct');});
+  showExp(false,q.e,true);showNB();checkScams();
+}
+
+function showExp(ok,e,to=false){
+  const box=document.getElementById('expbox'),icon=document.getElementById('expicon'),txt=document.getElementById('exptxt');
+  if(to){icon.textContent='⏰';txt.innerHTML=`<strong>Time's up!</strong> ${e}`;}
+  else if(ok){icon.textContent='✅';txt.innerHTML=`<strong>Correct! +${100+(tLeft*5)} pts</strong> ${e}`;}
+  else{icon.textContent='❌';txt.innerHTML=`<strong>Incorrect.</strong> ${e}`;}
+  box.classList.add('show');
+}
+function showNB(){const nb=document.getElementById('btn-next');nb.textContent=cur<9?'Next Question →':'See My Results →';nb.classList.add('show');}
+function nextQ(){if(!answered)return;cur++;if(cur>=10)finish();else renderQ();}
+
+function maybeScam(){} // legacy stub — replaced by checkScams()
+
+function checkScams(){
+  if(cur===airdropAt&&!airdropShown){airdropShown=true;setTimeout(()=>document.getElementById('ao').classList.add('show'),1400);}
+  if(cur===discordAt&&!discordShown){discordShown=true;setTimeout(triggerDiscordScam,1400);}
+}
+
+/* ── AIRDROP SCAM ── */
+function closeAirdrop(){document.getElementById('ao').classList.remove('show');}
+function fellForAirdrop(){clearInterval(tmr);document.getElementById('ao').classList.remove('show');showScreen('s-edu');}
+
+/* ── DISCORD SCAM ── */
+function triggerDiscordScam(){
+  const s=dcScenario;
+  document.getElementById('dc-toast-sender').textContent=s.name;
+  document.getElementById('dc-toast-prev').textContent=s.prev;
+  document.getElementById('dc-av-init').textContent=s.init;
+  document.getElementById('dc-sidebar-name').textContent=s.name;
+  document.getElementById('dc-hdr-init').textContent=s.init;
+  document.getElementById('dc-hdr-name').textContent=s.name;
+  document.getElementById('dc-input-ph').textContent=`Message @${s.name}`;
+  setTimeout(()=>document.getElementById('dc-badge').classList.add('show'),200);
+  setTimeout(()=>{document.getElementById('dc-badge').classList.remove('show');document.getElementById('dc-toast').classList.add('show');},2500);
+}
+function toastClick(){document.getElementById('dc-badge').classList.remove('show');document.getElementById('dc-toast').classList.add('show');}
+function getTime(){const n=new Date();let h=n.getHours(),m=n.getMinutes(),ap=h>=12?'PM':'AM';h=h%12||12;return`${h}:${String(m).padStart(2,'0')} ${ap}`;}
+function openDiscordDM(){
+  document.getElementById('dc-toast').classList.remove('show');
+  document.getElementById('dc-safe-btn').classList.remove('show');
+  // Clear messages — fresh slate every time
+  const msgs=document.getElementById('dc-messages');
+  msgs.innerHTML=`<div class="dc-sys-msg">Today at ${getTime()}</div>`;
+  document.getElementById('dc-modal').classList.add('show');
+  runMessages();
+  safeTimer=setTimeout(()=>document.getElementById('dc-safe-btn').classList.add('show'),20000);
+}
+async function runMessages(){
+  const msgs=document.getElementById('dc-messages');const s=dcScenario;let first=true;
+  for(let i=0;i<s.msgs.length;i++){
+    const ty=makeTyping(s.init);msgs.appendChild(ty);scrollB(msgs);ty.classList.add('show');
+    await sleep(1400+Math.random()*700);ty.classList.remove('show');await sleep(180);msgs.removeChild(ty);
+    addMsg(msgs,s.msgs[i],first,s);first=false;scrollB(msgs);await sleep(380);
+  }
+  await sleep(550);addCTA(msgs,s);scrollB(msgs);
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function makeTyping(init){const d=document.createElement('div');d.className='dc-typing';d.innerHTML=`<div class="dc-typing-av">${init}</div><div class="dc-typing-bub"><div class="dc-dot"></div><div class="dc-dot"></div><div class="dc-dot"></div></div>`;return d;}
+function addMsg(c,text,first,s){
+  if(first){const g=document.createElement('div');g.className='dc-msg-group';g.innerHTML=`<div class="dc-msg-av">${s.init}</div><div class="dc-msg-body"><div class="dc-msg-hdr"><span class="dc-msg-author">${s.name}</span><span class="dc-msg-badge">STAFF</span><span class="dc-msg-ts">Today at ${getTime()}</span></div><div class="dc-msg-text">${text}</div></div>`;c.appendChild(g);}
+  else{const f=document.createElement('div');f.className='dc-followup';f.innerHTML=`<div class="dc-followup-text">${text}</div>`;c.appendChild(f);}
+}
+function addCTA(c,s){const f=document.createElement('div');f.className='dc-followup';f.innerHTML=`<div class="dc-followup-text" style="margin-bottom:8px">Click the button below to get started:</div><div class="dc-cta-wrap"><button class="dc-cta-btn" style="background:${s.ctaC};color:#fff" onclick="fellForDiscord()">${s.cta}</button></div>`;c.appendChild(f);}
+function scrollB(el){el.scrollTop=el.scrollHeight;}
+function fellForDiscord(){clearTimeout(safeTimer);document.getElementById('dc-modal').classList.remove('show');document.getElementById('dc-safe-btn').classList.remove('show');showScreen('s-edu-dc');}
+function knownScam(){clearTimeout(safeTimer);document.getElementById('dc-modal').classList.remove('show');document.getElementById('dc-safe-btn').classList.remove('show');}
+
+/* ── API calls replace window.storage ── */
+async function saveScore(){
+  try{
+    await fetch('/api/score',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({n:username,s:score,c:correct})
+    });
+  }catch(e){console.warn('saveScore error:',e);}
+}
+
+async function loadLeaderboard(tab){
+  try{
+    const res=await fetch(`/api/leaderboard?tab=${tab}`);
+    return await res.json();
+  }catch(e){console.warn('loadLB error:',e);return[];}
+}
+
+async function finish(){
+  clearInterval(tmr);
+  const acc=Math.round((correct/10)*100);
+  let em,ti,su;
+  if(acc>=90){em='🏆';ti='Outstanding!';su="You're a Polymarket master. The leaderboard is yours.";}
+  else if(acc>=70){em='🎯';ti='Great Work!';su="Solid knowledge of prediction markets. Keep it up!";}
+  else if(acc>=50){em='👍';ti='Not Bad!';su="A good start. Try again to improve your score.";}
+  else{em='📚';ti='Keep Learning!';su="Revisit docs.polymarket.com and try again!";}
+  document.getElementById('remoji').textContent=em;
+  document.getElementById('rtitle').innerHTML=`${ti} <span class="rhandle">@${username}</span>`;
+  document.getElementById('rsub').textContent=su;
+  document.getElementById('rscore').textContent=score.toLocaleString();
+  document.getElementById('rcorrect').textContent=correct+'/10';
+  document.getElementById('racc').textContent=acc+'%';
+  showScreen('s-results');
+  await saveScore();
+  activeTab='today';
+  document.getElementById('tab-today').classList.add('active');
+  document.getElementById('tab-alltime').classList.remove('active');
+  await renderLB('today');
+}
+
+async function renderLB(tab){
+  const c=document.getElementById('lblist');
+  c.innerHTML='<div class="lbload">Loading…</div>';
+  const board=await loadLeaderboard(tab);
+  if(!board.length){
+    c.innerHTML=`<div class="lbempty">${tab==='today'?'No scores yet today — be the first! 🎉':'No all-time scores yet!'}</div>`;
+    return;
+  }
+  const medals=['🥇','🥈','🥉'],rc=['g','s','b'];
+  c.innerHTML=board.map((entry,i)=>{
+    const isYou=entry.n.toLowerCase()===username.toLowerCase();
+    const rk=i<3?`<div class="lbrank med ${rc[i]}">${medals[i]}</div>`:`<div class="lbrank">#${i+1}</div>`;
+    return`<div class="lbrow ${isYou?'you':''}">
+      ${rk}
+      <div class="lbname"><span class="lbntext">@${entry.n}</span>${isYou?'<span class="lbyou">YOU</span>':''}</div>
+      <div class="lbcorr">${entry.c}/10</div>
+      <div class="lbpts">${entry.s.toLocaleString()} pts</div>
+    </div>`;
+  }).join('');
+}
+
+function switchTab(tab){
+  activeTab=tab;
+  document.getElementById('tab-today').classList.toggle('active',tab==='today');
+  document.getElementById('tab-alltime').classList.toggle('active',tab==='alltime');
+  renderLB(tab);
+}
+
+function goIntro(){
+  clearInterval(tmr);clearTimeout(safeTimer);
+  ['ao','dc-badge','dc-toast','dc-modal'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  document.getElementById('dc-messages').innerHTML='';
+  document.getElementById('dc-safe-btn').classList.remove('show');
+  document.getElementById('s-edu-dc').classList.remove('active');
+  document.getElementById('nav-pts').textContent='';
+  showScreen('s-intro');
+}
+
+function shareScore(){
+  const txt=`I scored ${score.toLocaleString()} pts on the Polymarket Knowledge Quiz! (${correct}/10 correct) 🎯 Can you beat me? @Polymarket`;
+  if(navigator.clipboard)navigator.clipboard.writeText(txt).then(()=>toast('📋 Copied to clipboard!'));
+  else toast('Score: '+txt);
+}
+
+setInterval(()=>{
+  const el=document.getElementById('sclock');if(!el)return;
+  const m=el.textContent.match(/(\d+):(\d+)/);if(!m)return;
+  let mm=+m[1],ss=+m[2];
+  if(ss>0)ss--;else if(mm>0){mm--;ss=59;}
+  el.textContent=`⏰ Offer expires in: ${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')} — Act now!`;
+},1000);
+</script>
+</body>
+</html>
